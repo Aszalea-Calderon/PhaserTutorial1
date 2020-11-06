@@ -19,6 +19,9 @@ var config = {
 var players;
 var platforms;
 var cursors;
+var gem;
+var score = 0;
+var scoreText;
 
 var game = new Phaser.Game(config);
 
@@ -38,20 +41,25 @@ function create() {
 
   platforms = this.physics.add.staticGroup();
 
-  platforms.create(100, 500, "ground").setScale(2).refreshBody();
+  platforms.create(400, 568, "ground").setScale(2).refreshBody();
+  platforms.create(1, 700, "ground").setScale(1).refreshBody();
+  platforms.create(100, 400, "ground").setScale(2).refreshBody();
   platforms.create(50, 400, "ground");
   // platforms.create(600, 400, "ground");
-  platforms.create(300, 300, "ground");
-  platforms.create(600, 220, "ground");
-  platforms.create(40, 200, "ground");
+  platforms.create(258, 300, "ground");
+  platforms.create(500, 90, "ground");
+  platforms.create(700, 220, "ground");
+  platforms.create(600, 30, "ground");
+  platforms.create(90, 200, "ground");
   platforms.create(150, 100, "ground"); //Top
 
   //Player
   player = this.physics.add.sprite(100, 450, "dude");
 
   // player.body.setGravityY(300);
-  player.setBounce(0);
+  player.setBounce(1);
   player.setCollideWorldBounds(true);
+
   //Above creates the physical character
 
   this.anims.create({
@@ -75,8 +83,27 @@ function create() {
   });
 
   cursors = this.input.keyboard.createCursorKeys();
+  //stars
+
+  gem = this.physics.add.group({
+    key: "gem",
+    repeat: 20,
+    setXY: { x: 15, y: 0, stepX: 70 },
+  });
+
+  gem.children.iterate(function (child) {
+    child.setBounceY(Phaser.Math.FloatBetween(0.2, 0));
+  });
+
+  // scoreText = this.add.text(16, 16, "score: 0", {
+  //   fontSize: "32px",
+  //   fill: "#000",
+  // });
 
   this.physics.add.collider(player, platforms);
+  this.physics.add.collider(gem, platforms);
+
+  this.physics.add.overlap(player, gem, collectGem, null, this);
 }
 
 function update() {
@@ -98,6 +125,13 @@ function update() {
     player.setVelocityY(-400);
     // player.setVelocityX(900);
   }
+}
+
+function collectGem(player, gem) {
+  gem.disableBody(true, true);
+
+  // score += 10;
+  // scoreText.setText("Score:" + score);
 }
 
 // // Initialize the Phaser Game object and set default game window size
